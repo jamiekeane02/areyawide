@@ -276,7 +276,7 @@ box-sizing: border-box;
 <!-- Header -->
 <header>
 <nav>
-<div class="logo">ThreadCo</div>
+<div class="logo">Are Ya Wide</div>
 <ul class="nav-links">
 <li><a href="#home">Home</a></li>
 <li><a href="#products">Products</a></li>
@@ -449,3 +449,4 @@ box-sizing: border-box;
 </script>
 </body>
 </html>
+
