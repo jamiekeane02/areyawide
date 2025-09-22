@@ -183,17 +183,25 @@
 </script>
 
 <script>
-var typed = new Typed('#typed-logo', {
-    strings: ['Are Ya Wide'],
-    startDelay: 1000,     // wait 1s before starting
-    typeSpeed: 80,        // typing speed in ms per character
-    backSpeed: 100,       // backspacing speed in ms per character
-    backDelay: 1000,      // wait 1s before backspacing
-    loop: true,           // loop infinitely
-    showCursor: true,     // show blinking cursor
-    cursorChar: '|'       // cursor character
+// Typed.js initialization
+document.addEventListener('DOMContentLoaded', function() {
+   var typed = new Typed('#typed-logo', {
+        strings: ['Are Ya Wide'],
+        startDelay: 1000,
+        typeSpeed: 150,
+        backSpeed: 30,
+        backDelay: 3000,
+        loop: true,
+        showCursor: true,
+        cursorChar: '|',
+        fadeOut: true,
+        fadeOutDelay: 0
+    });
 });
 </script>
+
+
+
 
 </body>
 </html>
