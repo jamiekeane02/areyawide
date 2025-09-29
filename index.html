@@ -5,14 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>areyawide</title>
 <link rel="stylesheet" href="styles.css">
-<!-- Typed.js CDN -->
-<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
-                </head>
+
+<script src="https://cdn.jsdelivr.net/npm/typeit@8.7.1/dist/index.umd.js"></script>
+</head>
 <body>
 <!-- Header -->
 <header>
 <nav>
-<div class="logo"><span id="typed-logo">Are Ya Wide</span></div>
+    
+<div class="logo">
+  <span id="typed-logo"></span>
+</div>
+
 <ul class="nav-links">
 <li><a href="#home">Home</a></li>
 <li><a href="#products">Products</a></li>
@@ -22,6 +26,7 @@
 <a href="#cart" class="cart-icon">Cart (0)</a>
 </nav>
 </header>
+
 <!-- Hero Section -->
 <section class="hero" id="home">
     <!-- Main hero image is set via CSS background -->
@@ -183,25 +188,19 @@
 </script>
 
 <script>
-// Typed.js initialization
-document.addEventListener('DOMContentLoaded', function() {
-   var typed = new Typed('#typed-logo', {
-        strings: ['Are Ya Wide'],
-        startDelay: 1000,
-        typeSpeed: 150,
-        backSpeed: 30,
-        backDelay: 3000,
-        loop: true,
-        showCursor: true,
-        cursorChar: '|',
-        fadeOut: true,
-        fadeOutDelay: 0
-    });
-});
+new TypeIt("#typed-logo", {
+  speed: 200,
+  loop: true
+})
+  .type("Are Ya Wide")
+  .pause(1500)
+  .delete(4) // deletes "Wide"
+  .type("?")
+  .pause(2500)
+  .delete()  // clears everything
+  .go();
+
 </script>
-
-
-
 
 </body>
 </html>
