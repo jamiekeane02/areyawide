@@ -84,6 +84,7 @@ nav {
 .products {
     padding: 5rem 0;
     background: #f8f9fa;
+    font-weight: normal;
 }
 .container {
     max-width: 1200px;
@@ -131,27 +132,34 @@ nav {
     stroke: white;
     stroke-width: 2;
 }
+
 .product-image {
-    height: 250px;
-    background: #ddd;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #666;
-    font-size: 1.1rem;
+  width: 100%;
+  height: 250px; /* adjust height as needed */
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;  /* fills width, crops height */
+}
+
 .product-info {
     padding: 1.5rem;
 }
 .product-title {
     font-size: 1.3rem;
+    font-weight: normal;
     margin-bottom: 0.5rem;
     color: #2c3e50;
     font-family: Arial, sans-serif;
 }
 .product-price {
     font-size: 1.2rem;
-    font-weight: bold;
     color: #e74c3c;
     font-family: Arial, sans-serif;
 }
