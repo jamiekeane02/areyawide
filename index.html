@@ -29,7 +29,11 @@
 
 <!-- Hero Section -->
 <section class="hero" id="home">
-    <!-- Main hero image is set via CSS background -->
+  <div class="hero-slider">
+    <img src="images/IMG_6885.jpeg" alt="Hero Image 1">
+    <img src="images/IMG_6889.jpeg" alt="Hero Image 2">
+    <img src="images/IMG_6882.jpeg" alt="Hero Image 3">
+  </div>
 </section>
 
 <!-- Products Section -->
@@ -199,7 +203,20 @@ new TypeIt("#typed-logo", {
   .pause(2500)
   .delete()  // clears everything
   .go();
+</script>
 
+<script>
+const slider = document.querySelector('.hero-slider');
+const slides = document.querySelectorAll('.hero-slider img');
+let current = 0;
+
+function slideNext() {
+  current = (current + 1) % slides.length;
+  slider.style.transform = `translateX(-${current * 100}%)`;
+}
+
+// Change slide every 5 seconds
+setInterval(slideNext, 5000);
 </script>
 
 </body>
