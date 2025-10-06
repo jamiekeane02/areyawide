@@ -210,9 +210,25 @@ const slider = document.querySelector('.hero-slider');
 const slides = document.querySelectorAll('.hero-slider img');
 let current = 0;
 
+// Clone the first slide and append it to the end
+const firstClone = slides[0].cloneNode(true);
+slider.appendChild(firstClone);
+
+const totalSlides = slides.length + 1; // including the clone
+
 function slideNext() {
-  current = (current + 1) % slides.length;
-  slider.style.transform = `translateX(-${current * 100}%)`;
+    current++;
+    slider.style.transition = 'transform 0.8s ease-in-out';
+    slider.style.transform = `translateX(-${current * 100}%)`;
+
+    // When we reach the clone, reset to the real first slide
+    if (current === totalSlides - 1) {
+        setTimeout(() => {
+            slider.style.transition = 'none';
+            slider.style.transform = `translateX(0)`;
+            current = 0;
+        }, 800); // match the transition duration
+    }
 }
 
 // Change slide every 5 seconds
