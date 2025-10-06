@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>areyawide | appreciate every rollie Tee</title>
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/typeit@8.7.1/dist/index.umd.js"></script>
+</head>
+<body>
+<header>
+<nav>
+<div class="logo">
+  <span id="typed-logo"></span>
+</div>
+<ul class="nav-links">
+<li><a href="index.html#home">Home</a></li>
+<li><a href="products.html">Products</a></li>
+<li><a href="index.html#about">About</a></li>
+<li><a href="index.html#contact">Contact</a></li>
+</ul>
+<a href="#cart" class="cart-icon">Cart (0)</a>
+</nav>
+</header>
+
+<main class="product-detail">
+    <div class="container product-detail-layout">
+        <div class="product-detail-gallery">
+            <div class="product-detail-main-image">
+                <img src="images/IMG_3183.jpg" alt="appreciate every rollie Tee">
+            </div>
+            <div class="product-detail-thumbnails">
+                <img src="images/IMG_3183.jpg" alt="Front of appreciate every rollie Tee">
+                <img src="images/IMG_6885.jpeg" alt="Lifestyle shot of appreciate every rollie Tee">
+                <img src="images/IMG_6882.jpeg" alt="Fabric detail of appreciate every rollie Tee">
+            </div>
+        </div>
+
+        <div class="product-detail-info">
+            <h1 class="product-detail-title">appreciate every rollie Tee</h1>
+            <p class="product-detail-price">25 EUR</p>
+
+            <p class="product-detail-description">
+                Inspired by the timeless appreciation for every moment, the appreciate every rollie Tee is crafted from a
+                heavyweight cotton blend that keeps its shape while feeling soft against the skin. Printed with our signature
+                artwork, it brings a bold statement to everyday fits.
+            </p>
+
+            <div class="product-detail-section">
+                <h2>Fit &amp; Sizing</h2>
+                <ul>
+                    <li>Relaxed, true-to-size silhouette</li>
+                    <li>Refer to the size chart below for exact measurements</li>
+                    <li>Model is 6'0" wearing a size Large</li>
+                </ul>
+            </div>
+
+            <div class="product-detail-section">
+                <h2>Select Size</h2>
+                <div class="product-detail-sizes">
+                    <button type="button" class="size-option">S</button>
+                    <button type="button" class="size-option">M</button>
+                    <button type="button" class="size-option">L</button>
+                    <button type="button" class="size-option">XL</button>
+                </div>
+            </div>
+
+            <div class="product-detail-actions">
+                <button type="button" class="btn btn-primary" data-action="add-to-cart">Add to Cart</button>
+                <button type="button" class="btn btn-outline">Buy Now</button>
+            </div>
+
+            <div class="product-detail-section">
+                <h2>Product Details</h2>
+                <ul>
+                    <li>100% ringspun cotton</li>
+                    <li>Pre-shrunk for long-lasting wear</li>
+                    <li>Designed and printed in-house</li>
+                    <li>Machine wash cold, hang dry</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html#home">Home</a></li>
+                    <li><a href="products.html">Products</a></li>
+                    <li><a href="index.html#about">About</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Customer Service</h3>
+                <ul>
+                    <li><a href="#shipping">Shipping Info</a></li>
+                    <li><a href="#returns">Returns</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="#support">Support</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Info</h3>
+                <ul>
+                    <li>Email: hello@threadco.com</li>
+                    <li>Phone: (555) 123-4567</li>
+                    <li>Address: 123 Fashion St, Style City</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 ThreadCo. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+let cartCount = 0;
+const cartIcon = document.querySelector('.cart-icon');
+const addToCartButton = document.querySelector('[data-action="add-to-cart"]');
+const sizeOptions = document.querySelectorAll('.size-option');
+const mainImage = document.querySelector('.product-detail-main-image img');
+const thumbnails = document.querySelectorAll('.product-detail-thumbnails img');
+
+sizeOptions.forEach(button => {
+    button.addEventListener('click', () => {
+        sizeOptions.forEach(option => option.classList.remove('active'));
+        button.classList.add('active');
+    });
+});
+
+if (addToCartButton) {
+    addToCartButton.addEventListener('click', () => {
+        cartCount++;
+        cartIcon.textContent = `Cart (${cartCount})`;
+    });
+}
+
+thumbnails.forEach(thumbnail => {
+    thumbnail.addEventListener('click', () => {
+        mainImage.src = thumbnail.src;
+        mainImage.alt = thumbnail.alt;
+        thumbnails.forEach(image => image.classList.remove('active'));
+        thumbnail.classList.add('active');
+    });
+});
+
+if (thumbnails.length > 0) {
+    thumbnails[0].classList.add('active');
+}
+</script>
+
+<script>
+new TypeIt("#typed-logo", {
+  speed: 200,
+  loop: true
+})
+  .type("Are Ya Wide")
+  .pause(1500)
+  .delete(4)
+  .type("?")
+  .pause(2500)
+  .delete()
+  .go();
+</script>
+</body>
+</html>
