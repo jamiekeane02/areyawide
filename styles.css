@@ -120,8 +120,10 @@ nav {
 
 .products {
     padding: 5rem 0;
-    background: #f8f9fa;
+    background: #2b2b2b;
     font-weight: normal;
+    position: relative;
+    overflow: hidden;
 }
 .container {
     max-width: 1200px;
@@ -436,7 +438,7 @@ nav {
     }
 }
 footer {
-    background: #2c3e50;
+    background: #2b2b2b;
     color: white;
     padding: 3rem 0 1rem;
 }
@@ -467,6 +469,70 @@ footer {
     padding-top: 1rem;
     text-align: center;
     color: #bdc3c7;
+}
+
+.matrix-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.75;
+}
+
+#matrix-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.products > .container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Mouse trail particles */
+.mouse-trail-particle {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 4px;
+    pointer-events: none;
+    border-radius: 0;
+    background: var(--pixel-color, rgba(58, 190, 90, 0.94));
+    opacity: 0.92;
+    border: none;
+    box-shadow: var(--pixel-shadow, none);
+    mix-blend-mode: normal;
+    filter: none;
+    image-rendering: pixelated;
+    --spray-x: 0px;
+    --spray-y: 0px;
+    --spray-drip: 0px;
+    --spray-duration: 0.4s;
+    transform: translate(-50%, -50%);
+    will-change: transform, opacity;
+    animation: pixelSpray var(--spray-duration) steps(5, end) forwards;
+    z-index: 2000;
+}
+
+@keyframes pixelSpray {
+    0% {
+        transform: translate(-50%, -50%) translate(0, 0);
+        opacity: 0.98;
+    }
+    50% {
+        transform: translate(-50%, -50%) translate(calc(var(--spray-x) * 0.45), calc(var(--spray-y) * 0.3));
+        opacity: 0.85;
+    }
+    80% {
+        transform: translate(-50%, -50%) translate(calc(var(--spray-x) * 0.7), calc(var(--spray-y) * 0.6 + var(--spray-drip) * 0.5));
+        opacity: 0.55;
+    }
+    100% {
+        transform: translate(-50%, -50%) translate(calc(var(--spray-x)), calc(var(--spray-y) + var(--spray-drip)));
+        opacity: 0;
+    }
 }
 @media (max-width: 768px) {
     .nav-links {

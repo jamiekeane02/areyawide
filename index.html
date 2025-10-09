@@ -20,7 +20,6 @@
 <ul class="nav-links">
 <li><a href="#home">Home</a></li>
 <li><a href="products.html">Products</a></li>
-<li><a href="#contact">Contact</a></li>
 </ul>
 <a href="#cart" class="cart-icon">Cart (0)</a>
 </nav>
@@ -40,6 +39,9 @@
 
 <!-- Products Section -->
 <section class="products" id="products">
+    <div class="matrix-overlay">
+        <canvas id="matrix-canvas"></canvas>
+    </div>
     <div class="container">
         <h2 class="section-title">Our T-Shirt Collection</h2>
         <div class="product-grid">
@@ -70,7 +72,6 @@
                 <ul>
                     <li><a href="#home">Home</a></li>
                     <li><a href="products.html">Products</a></li>
-                    <li><a href="#contact">Contact</a></li>
                 </ul>
             </div>
             <div class="footer-section">
@@ -180,6 +181,199 @@ function slideNext() {
 
 // Change slide every 5 seconds
 setInterval(slideNext, 5000);
+</script>
+
+<script>
+// Matrix-style animation with Irish flag colors over the products section
+(function () {
+  const section = document.querySelector('.products');
+  const canvas = document.getElementById('matrix-canvas');
+  if (!section || !canvas) {
+    return;
+  }
+
+  const ctx = canvas.getContext('2d');
+  const colors = ['#169B62', '#FFFFFF', '#FF883E'];
+  const phrase = 'ARE YA WIDE ';
+  const fontFamily = "'Courier New', monospace";
+  const fontSize = 14;
+  let drops = [];
+  let width = 0;
+  let height = 0;
+  let lastFrame = 0;
+
+  function setupCanvas() {
+    const rect = section.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    width = Math.max(rect.width, 1);
+    height = Math.max(rect.height, 1);
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpr, dpr);
+    ctx.font = `${fontSize}px ${fontFamily}`;
+    ctx.textBaseline = 'top';
+    const columnCount = Math.ceil(width / fontSize);
+    drops = Array(columnCount).fill(0);
+  }
+
+  function drawMatrix() {
+    ctx.fillStyle = 'rgba(43, 43, 43, 0.1)';
+    ctx.fillRect(0, 0, width, height);
+
+    for (let i = 0; i < drops.length; i += 1) {
+      const x = i * fontSize;
+      const y = drops[i] * fontSize;
+      const charIndex = (drops[i] + i) % phrase.length;
+      const color = colors[(i + charIndex) % colors.length];
+      const char = phrase.charAt(charIndex);
+      ctx.fillStyle = color;
+      ctx.fillText(char === ' ' ? ' ' : char, x, y);
+
+      if (y > height && Math.random() > 0.975) {
+        drops[i] = 0;
+      } else {
+        drops[i] += 1;
+      }
+    }
+  }
+
+  function animate(time) {
+    if (time - lastFrame > 33) {
+      drawMatrix();
+      lastFrame = time;
+    }
+    requestAnimationFrame(animate);
+  }
+
+  setupCanvas();
+  window.addEventListener('resize', setupCanvas);
+  requestAnimationFrame(animate);
+})();
+</script>
+
+<script>
+// Create a spray-can style green particle trail that follows the pointer
+(function () {
+  const spawnThrottle = 24; // milliseconds between spray bursts
+  let lastSpawn = 0;
+  let lastPointer = null;
+  let sprayAngle = Math.PI / 2;
+  let spraySpeed = 0.25;
+  const pixelStep = 3;
+  const palette = [
+    '#68ff6f',
+    '#47da58',
+    '#7cff90',
+    '#39c74f'
+  ];
+
+  function updateDirection(x, y, timestamp) {
+    if (!lastPointer) {
+      lastPointer = { x, y, time: timestamp };
+      sprayAngle = Math.PI / 2;
+      spraySpeed = 0.25;
+      return;
+    }
+
+    const dx = x - lastPointer.x;
+    const dy = y - lastPointer.y;
+    const dt = Math.max(timestamp - lastPointer.time, 16);
+    const distance = Math.hypot(dx, dy);
+
+    if (distance > 0.5) {
+      const pointerAngle = Math.atan2(dy, dx);
+      const blend = 0.35;
+      const vx = Math.cos(pointerAngle) * blend + Math.cos(Math.PI / 2) * (1 - blend);
+      const vy = Math.sin(pointerAngle) * blend + Math.sin(Math.PI / 2) * (1 - blend);
+      sprayAngle = Math.atan2(vy, vx);
+      const speed = distance / dt;
+      spraySpeed = Math.min(speed, 0.8);
+    } else {
+      spraySpeed *= 0.85;
+    }
+
+    lastPointer = { x, y, time: timestamp };
+  }
+
+  function spawnParticle(x, y) {
+    const particle = document.createElement('span');
+    particle.className = 'mouse-trail-particle';
+    const size = 3 + Math.floor(Math.random() * 2); // 3px or 4px
+    particle.style.width = `${size}px`;
+    particle.style.height = `${size}px`;
+
+    const nozzleJitterX = (Math.random() - 0.5) * 3;
+    const nozzleJitterY = (Math.random() - 0.5) * 3;
+    const px = Math.round((x + nozzleJitterX) / pixelStep) * pixelStep;
+    const py = Math.round((y + nozzleJitterY) / pixelStep) * pixelStep;
+    particle.style.left = `${px}px`;
+    particle.style.top = `${py}px`;
+
+    const color = palette[Math.floor(Math.random() * palette.length)];
+    particle.style.setProperty('--pixel-color', color);
+    if (Math.random() < 0.35) {
+      const accent = palette[Math.floor(Math.random() * palette.length)];
+      const offsetX = (Math.random() < 0.5 ? -1 : 1) * pixelStep;
+      const offsetY = (Math.random() < 0.5 ? 0 : pixelStep);
+      particle.style.setProperty('--pixel-shadow', `${offsetX}px ${offsetY}px 0 ${accent}`);
+    } else {
+      particle.style.setProperty('--pixel-shadow', 'none');
+    }
+
+    const spread = 0.14;
+    const angle = sprayAngle + (Math.random() - 0.5) * spread;
+    const baseDistance = 8 + spraySpeed * 8;
+    const distance = baseDistance * (0.7 + Math.random() * 0.2);
+    const drift = distance * 0.18 + Math.random() * 6;
+
+    const sprayX = Math.round((Math.cos(angle) * distance) / pixelStep) * pixelStep;
+    const sprayY = Math.round((Math.sin(angle) * distance) / pixelStep) * pixelStep;
+    const sprayDrip = Math.round(drift / pixelStep) * pixelStep;
+
+    particle.style.setProperty('--spray-x', `${sprayX}px`);
+    particle.style.setProperty('--spray-y', `${sprayY}px`);
+    particle.style.setProperty('--spray-drip', `${sprayDrip}px`);
+    particle.style.setProperty('--spray-duration', `${(0.28 + Math.random() * 0.2).toFixed(2)}s`);
+
+    document.body.appendChild(particle);
+
+    particle.addEventListener('animationend', () => {
+      particle.remove();
+    });
+  }
+
+  function emitSpray(x, y) {
+    const burst = 6 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < burst; i += 1) {
+      spawnParticle(x, y);
+    }
+  }
+
+  document.addEventListener('pointermove', (event) => {
+    const now = performance.now();
+    updateDirection(event.clientX, event.clientY, now);
+    if (now - lastSpawn < spawnThrottle) {
+      return;
+    }
+    lastSpawn = now;
+    emitSpray(event.clientX, event.clientY);
+  });
+
+  document.addEventListener('pointerdown', (event) => {
+    const now = performance.now();
+    updateDirection(event.clientX, event.clientY, now);
+    emitSpray(event.clientX, event.clientY);
+  });
+
+  document.addEventListener('pointerleave', () => {
+    lastPointer = null;
+    spraySpeed = 0.25;
+    sprayAngle = Math.PI / 2;
+  });
+})();
 </script>
 
 </body>
