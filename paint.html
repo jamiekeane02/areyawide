@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>areyawide | Paint</title>
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/typeit@8.7.1/dist/index.umd.js"></script>
+</head>
+<body>
+<header>
+<nav>
+<div class="logo">
+  <span id="typed-logo"></span>
+</div>
+<ul class="nav-links">
+  <li><a href="index.html#home">Home</a></li>
+  <li><a href="products.html">Products</a></li>
+  <li><a href="paint.html" aria-current="page">Paint</a></li>
+</ul>
+<a href="#cart" class="cart-icon">Cart (0)</a>
+</nav>
+</header>
+
+<main class="paint-main">
+  <div class="paint-window">
+    <div class="paint-title-bar">
+      <div class="paint-title">areyawide paint</div>
+      <div class="paint-title-controls">
+        <span class="paint-title-btn">_</span>
+        <span class="paint-title-btn">&#9633;</span>
+        <span class="paint-title-btn">X</span>
+      </div>
+    </div>
+    <div class="paint-menu-bar">
+      <span>File</span>
+      <span>Edit</span>
+      <span>View</span>
+      <span>Image</span>
+      <span>Colors</span>
+      <span>Help</span>
+    </div>
+    <div class="paint-toolbar">
+      <div class="paint-tools">
+        <button type="button" data-tool="brush" class="paint-tool is-active">Brush</button>
+        <button type="button" data-tool="eraser" class="paint-tool">Eraser</button>
+        <button type="button" data-action="clear-canvas" class="paint-tool paint-tool-danger">Clear</button>
+      </div>
+      <div class="paint-brush">
+        <label for="brush-size">Brush Size</label>
+        <input type="range" id="brush-size" min="2" max="40" value="8">
+        <span id="brush-size-display">8px</span>
+      </div>
+      <div class="paint-actions">
+        <button type="button" data-action="save-image" class="paint-save-btn" aria-label="Save image">Paint</button>
+      </div>
+    </div>
+    <div class="paint-color-bar">
+      <div class="paint-palette" role="list" aria-label="Color palette">
+        <button type="button" class="paint-color is-selected" style="--paint-color:#000000;" aria-label="Black" data-color="#000000"></button>
+        <button type="button" class="paint-color" style="--paint-color:#ffffff;" aria-label="White" data-color="#ffffff"></button>
+        <button type="button" class="paint-color" style="--paint-color:#ff0000;" aria-label="Red" data-color="#ff0000"></button>
+        <button type="button" class="paint-color" style="--paint-color:#ffff00;" aria-label="Yellow" data-color="#ffff00"></button>
+        <button type="button" class="paint-color" style="--paint-color:#00ff00;" aria-label="Green" data-color="#00ff00"></button>
+        <button type="button" class="paint-color" style="--paint-color:#00ffff;" aria-label="Cyan" data-color="#00ffff"></button>
+        <button type="button" class="paint-color" style="--paint-color:#0000ff;" aria-label="Blue" data-color="#0000ff"></button>
+        <button type="button" class="paint-color" style="--paint-color:#ff00ff;" aria-label="Magenta" data-color="#ff00ff"></button>
+        <button type="button" class="paint-color" style="--paint-color:#804000;" aria-label="Brown" data-color="#804000"></button>
+        <button type="button" class="paint-color" style="--paint-color:#ff8800;" aria-label="Orange" data-color="#ff8800"></button>
+        <button type="button" class="paint-color" style="--paint-color:#8800ff;" aria-label="Purple" data-color="#8800ff"></button>
+        <button type="button" class="paint-color" style="--paint-color:#808080;" aria-label="Gray" data-color="#808080"></button>
+      </div>
+    </div>
+    <div class="paint-canvas-wrapper">
+      <canvas id="paint-canvas" width="960" height="520" aria-label="Drawing canvas"></canvas>
+      <div class="paint-canvas-grid"></div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+      <div class="footer-content">
+          <div class="footer-section">
+              <h3>Quick Links</h3>
+              <ul>
+                  <li><a href="index.html#home">Home</a></li>
+                  <li><a href="products.html">Products</a></li>
+                  <li><a href="paint.html">Paint</a></li>
+              </ul>
+          </div>
+          <div class="footer-section">
+              <h3>Customer Service</h3>
+              <ul>
+                  <li><a href="#shipping">Shipping Info</a></li>
+                  <li><a href="#returns">Returns</a></li>
+                  <li><a href="#faq">FAQ</a></li>
+                  <li><a href="#support">Support</a></li>
+              </ul>
+          </div>
+          <div class="footer-section">
+              <h3>Contact Info</h3>
+              <ul>
+                  <li>Email: hello@threadco.com</li>
+                  <li>Phone: (555) 123-4567</li>
+                  <li>Address: 123 Fashion St, Style City</li>
+              </ul>
+          </div>
+      </div>
+      <div class="footer-bottom">
+          <p>&copy; 2025 ThreadCo. All rights reserved.</p>
+      </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  const canvas = document.getElementById('paint-canvas');
+  const ctx = canvas.getContext('2d');
+  const brushSizeInput = document.getElementById('brush-size');
+  const brushSizeDisplay = document.getElementById('brush-size-display');
+  const colorButtons = document.querySelectorAll('.paint-color');
+  const toolButtons = document.querySelectorAll('.paint-tool');
+  const saveButton = document.querySelector('[data-action="save-image"]');
+  const clearButton = document.querySelector('[data-action="clear-canvas"]');
+
+  let drawing = false;
+  let currentColor = '#000000';
+  let brushSize = Number(brushSizeInput.value);
+  let currentTool = 'brush';
+  let lastPosition = null;
+  let activePointerId = null;
+
+  function setCanvasBackground() {
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+  function updateBrushSize(value) {
+    brushSize = Number(value);
+    brushSizeDisplay.textContent = `${brushSize}px`;
+  }
+
+  function startDrawing(event) {
+    event.preventDefault();
+    activePointerId = event.pointerId;
+    try {
+      canvas.setPointerCapture(activePointerId);
+    } catch (captureError) {
+      /* ignore pointer capture errors */
+    }
+    drawing = true;
+    lastPosition = getCanvasCoords(event);
+    drawDot(lastPosition.x, lastPosition.y);
+  }
+
+  function stopDrawing(event) {
+    if (!drawing) {
+      return;
+    }
+    if (event && typeof event.preventDefault === 'function') {
+      event.preventDefault();
+    }
+    drawing = false;
+    lastPosition = null;
+    ctx.beginPath();
+    if (typeof activePointerId === 'number') {
+      try {
+        canvas.releasePointerCapture(activePointerId);
+      } catch (releaseError) {
+        /* ignore pointer capture errors */
+      }
+    }
+    activePointerId = null;
+  }
+
+  function draw(event) {
+    if (!drawing || !lastPosition) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const position = getCanvasCoords(event);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = brushSize;
+    ctx.strokeStyle = currentTool === 'eraser' ? '#ffffff' : currentColor;
+    ctx.fillStyle = ctx.strokeStyle;
+
+    ctx.beginPath();
+    ctx.moveTo(lastPosition.x, lastPosition.y);
+    ctx.lineTo(position.x, position.y);
+    ctx.stroke();
+
+    lastPosition = position;
+  }
+
+  function drawDot(x, y) {
+    ctx.beginPath();
+    ctx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
+    ctx.fillStyle = currentTool === 'eraser' ? '#ffffff' : currentColor;
+    ctx.fill();
+    ctx.closePath();
+  }
+
+  function getCanvasCoords(event) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = rect.width ? canvas.width / rect.width : 1;
+    const scaleY = rect.height ? canvas.height / rect.height : 1;
+    return {
+      x: (event.clientX - rect.left) * scaleX,
+      y: (event.clientY - rect.top) * scaleY
+    };
+  }
+
+  function handleColorChange(button) {
+    currentColor = button.dataset.color;
+    currentTool = 'brush';
+    toolButtons.forEach(tool => tool.classList.toggle('is-active', tool.dataset.tool === 'brush'));
+    colorButtons.forEach(color => color.classList.toggle('is-selected', color === button));
+  }
+
+  function handleToolChange(button) {
+    currentTool = button.dataset.tool;
+    toolButtons.forEach(tool => tool.classList.toggle('is-active', tool === button));
+  }
+
+  function saveImage() {
+    const link = document.createElement('a');
+    link.download = `areyawide-paint-${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }
+
+  function clearCanvas() {
+    setCanvasBackground();
+    ctx.beginPath();
+  }
+
+  brushSizeInput.addEventListener('input', (event) => {
+    updateBrushSize(event.target.value);
+  });
+
+  colorButtons.forEach(button => {
+    button.addEventListener('click', () => handleColorChange(button));
+  });
+
+  toolButtons.forEach(button => {
+    if (button.dataset.tool) {
+      button.addEventListener('click', () => handleToolChange(button));
+    }
+  });
+
+  saveButton.addEventListener('click', saveImage);
+  clearButton.addEventListener('click', clearCanvas);
+
+  canvas.addEventListener('pointerdown', startDrawing);
+  canvas.addEventListener('pointermove', draw);
+  canvas.addEventListener('pointerup', stopDrawing);
+  canvas.addEventListener('pointerleave', stopDrawing);
+  canvas.addEventListener('pointercancel', stopDrawing);
+  canvas.addEventListener('contextmenu', (event) => event.preventDefault());
+
+  updateBrushSize(brushSizeInput.value);
+  setCanvasBackground();
+})();
+</script>
+
+<script>
+new TypeIt("#typed-logo", {
+  speed: 200,
+  loop: true
+})
+  .type("Are Ya Wide")
+  .pause(1500)
+  .delete(4)
+  .type("?")
+  .pause(2500)
+  .delete()
+  .go();
+</script>
+</body>
+</html>

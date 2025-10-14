@@ -16,12 +16,16 @@
 <ul class="nav-links">
 <li><a href="index.html#home">Home</a></li>
 <li><a href="products.html">Products</a></li>
+<li><a href="paint.html">Paint</a></li>
 </ul>
 <a href="#cart" class="cart-icon">Cart (0)</a>
 </nav>
 </header>
 
 <section class="products" id="products">
+    <div class="matrix-overlay">
+        <canvas id="matrix-canvas"></canvas>
+    </div>
     <div class="container">
         <h2 class="section-title">Our T-Shirt Collection</h2>
         <div class="product-grid">
@@ -51,6 +55,7 @@
                 <ul>
                     <li><a href="index.html#home">Home</a></li>
                     <li><a href="products.html">Products</a></li>
+                    <li><a href="paint.html">Paint</a></li>
                 </ul>
             </div>
             <div class="footer-section">
@@ -112,6 +117,77 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
+</script>
+
+<script>
+// Matrix-style animation with Irish flag colors over the products section
+(function () {
+    const section = document.querySelector('.products');
+    const canvas = document.getElementById('matrix-canvas');
+    if (!section || !canvas) {
+        return;
+    }
+
+    const ctx = canvas.getContext('2d');
+    const colors = ['#169B62', '#FFFFFF', '#FF883E'];
+    const phrase = 'ARE YA WIDE ';
+    const fontFamily = "'Courier New', monospace";
+    const fontSize = 14;
+    let drops = [];
+    let width = 0;
+    let height = 0;
+    let lastFrame = 0;
+
+    function setupCanvas() {
+        const rect = section.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        width = Math.max(rect.width, 1);
+        height = Math.max(rect.height, 1);
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(dpr, dpr);
+        ctx.font = `${fontSize}px ${fontFamily}`;
+        ctx.textBaseline = 'top';
+        const columnCount = Math.ceil(width / fontSize);
+        drops = Array(columnCount).fill(0);
+    }
+
+    function drawMatrix() {
+        ctx.fillStyle = 'rgba(43, 43, 43, 0.1)';
+        ctx.fillRect(0, 0, width, height);
+
+        for (let i = 0; i < drops.length; i += 1) {
+            const x = i * fontSize;
+            const y = drops[i] * fontSize;
+            const charIndex = (drops[i] + i) % phrase.length;
+            const color = colors[(i + charIndex) % colors.length];
+            const char = phrase.charAt(charIndex);
+            ctx.fillStyle = color;
+            ctx.fillText(char === ' ' ? ' ' : char, x, y);
+
+            if (y > height && Math.random() > 0.975) {
+                drops[i] = 0;
+            } else {
+                drops[i] += 1;
+            }
+        }
+    }
+
+    function animate(time) {
+        if (time - lastFrame > 33) {
+            drawMatrix();
+            lastFrame = time;
+        }
+        requestAnimationFrame(animate);
+    }
+
+    setupCanvas();
+    window.addEventListener('resize', setupCanvas);
+    requestAnimationFrame(animate);
+})();
 </script>
 
 <script>
