@@ -912,8 +912,20 @@ footer {
           margin-top: 48px; /* match new header height */
       }
       .product-detail {
-          margin-top: 36px;
-          padding: 3.5rem 0;
+          margin-top: 0; /* keep product-detail flush under header on small screens */
+          padding: 3rem 0 3.5rem;
+          min-height: auto;
+          display: block;
+      }
+      .product-detail-layout {
+          gap: 1.5rem;
+      }
+      .product-detail-gallery {
+          position: static;
+          gap: 1rem;
+      }
+      .product-detail-main-image {
+          max-height: none;
       }
       .product-detail-info {
           padding: 1.55rem;
