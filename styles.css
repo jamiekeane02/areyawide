@@ -245,7 +245,7 @@ nav {
 .product-detail {
     padding: 5rem 0;
     background: #2b2b2b;
-    margin-top: 48px;
+    margin-top: 0; /* remove top gap so content sits under transparent header */
 }
 
 .product-detail-layout {
@@ -781,7 +781,7 @@ footer {
           margin-top: 48px; /* match new header height */
       }
       .product-detail {
-          margin-top: 36px;
+          margin-top: 0; /* keep product-detail flush under header on small screens */
           padding: 3.5rem 0;
       }
       .product-detail-info {
