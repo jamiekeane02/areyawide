@@ -16,13 +16,15 @@
 <ul class="nav-links">
   <li><a href="index.html#home">Home</a></li>
   <li><a href="products.html">Products</a></li>
-  <li><a href="paint.html">Paint</a></li>
   </ul>
-<a href="#cart" class="cart-icon">Cart (0)</a>
+<a href="#cart" class="cart-icon" data-shopify-cart>Cart</a>
 </nav>
 </header>
 
 <main class="product-detail">
+    <div class="matrix-overlay">
+        <canvas id="matrix-canvas-product"></canvas>
+    </div>
     <div class="container product-detail-layout">
         <div class="product-detail-gallery">
             <div class="product-detail-main-image">
@@ -46,23 +48,22 @@
             </p>
 
             <div class="product-detail-purchase">
-                <div class="product-detail-sizes-group">
+            <div class="product-detail-sizes-group">
                     <h2 class="product-detail-subheading">Select Size</h2>
                     <div class="product-detail-sizes">
-                        <button type="button" class="size-option">S</button>
-                        <button type="button" class="size-option">M</button>
-                        <button type="button" class="size-option">L</button>
-                        <button type="button" class="size-option">XL</button>
+                        <button type="button" class="size-option" data-size="S">S</button>
+                        <button type="button" class="size-option" data-size="M">M</button>
+                        <button type="button" class="size-option" data-size="L">L</button>
+                        <button type="button" class="size-option" data-size="XL">XL</button>
                     </div>
                 </div>
 
                 <div class="product-detail-actions">
-                    <button type="button" class="btn btn-primary" data-action="add-to-cart">Add to Cart</button>
-                    <button type="button" class="btn btn-outline">Buy Now</button>
+                    <div id="product-component-1761673758850" class="shopify-buy-placeholder"></div>
                 </div>
             </div>
 
-            <details class="product-detail-accordion">
+               <details class="product-detail-accordion">
                 <summary>Fit &amp; Sizing</summary>
                 <ul>
                     <li>Fits true to size, heavyweight T-shirt</li>
@@ -110,39 +111,355 @@
 </footer>
 
 <script>
-let cartCount = 0;
-const cartIcon = document.querySelector('.cart-icon');
-const addToCartButton = document.querySelector('[data-action="add-to-cart"]');
-const sizeOptions = document.querySelectorAll('.size-option');
-const mainImage = document.querySelector('.product-detail-main-image img');
-const thumbnails = document.querySelectorAll('.product-detail-thumbnails img');
+(function () {
+  const sizeOptions = Array.from(document.querySelectorAll('.size-option'));
+  const cartIcon = document.querySelector('[data-shopify-cart]');
+  const mainImage = document.querySelector('.product-detail-main-image img');
+  const thumbnails = Array.from(document.querySelectorAll('.product-detail-thumbnails img'));
 
-sizeOptions.forEach(button => {
-    button.addEventListener('click', () => {
-        sizeOptions.forEach(option => option.classList.remove('active'));
+  function visuallyHideElement(element) {
+    if (!element) return;
+    element.style.position = 'absolute';
+    element.style.width = '1px';
+    element.style.height = '1px';
+    element.style.padding = '0';
+    element.style.margin = '-1px';
+    element.style.border = '0';
+    element.style.clip = 'rect(0 0 0 0)';
+    element.style.overflow = 'hidden';
+  }
+
+  function normalizeText(value) {
+    return (value || '').toString().trim().toLowerCase();
+  }
+
+  function updateActiveSizeButton(selectedText) {
+    const normalized = normalizeText(selectedText);
+    sizeOptions.forEach((button) => {
+      const buttonValue = normalizeText(button.dataset.size || button.textContent);
+      if (normalized && (buttonValue === normalized || normalized.includes(buttonValue))) {
         button.classList.add('active');
+      } else {
+        button.classList.remove('active');
+      }
     });
-});
+  }
 
-if (addToCartButton) {
-    addToCartButton.addEventListener('click', () => {
-        cartCount++;
-        cartIcon.textContent = `Cart (${cartCount})`;
+  function bindSizeButtonsToSelect(select) {
+    if (!select) {
+      return;
+    }
+
+    visuallyHideElement(select);
+    const label = select.parentElement && select.parentElement.querySelector('label');
+    visuallyHideElement(label);
+
+    sizeOptions.forEach((button) => {
+      if (button.dataset.shopifyBound === 'true') {
+        return;
+      }
+      button.dataset.shopifyBound = 'true';
+      button.addEventListener('click', () => {
+        const targetSize = normalizeText(button.dataset.size || button.textContent);
+        const matchingOption = Array.from(select.options).find((option) => {
+          const optionText = normalizeText(option.textContent);
+          return optionText === targetSize || optionText.includes(targetSize);
+        });
+
+        if (matchingOption) {
+          select.value = matchingOption.value;
+          select.dispatchEvent(new Event('change', { bubbles: true }));
+          updateActiveSizeButton(matchingOption.textContent);
+        }
+      });
     });
-}
 
-thumbnails.forEach(thumbnail => {
+    select.addEventListener('change', () => {
+      const selectedOption = select.options[select.selectedIndex];
+      if (selectedOption) {
+        updateActiveSizeButton(selectedOption.textContent);
+      }
+    });
+
+    const initialOption = select.options[select.selectedIndex];
+    if (initialOption) {
+      updateActiveSizeButton(initialOption.textContent);
+    } else if (sizeOptions.length) {
+      sizeOptions[0].classList.add('active');
+    }
+  }
+
+  function setupCartIcon(cartComponent) {
+    if (!cartComponent || !cartIcon) {
+      return;
+    }
+
+    function updateCartCount() {
+      const count = cartComponent.model && cartComponent.model.lineItemCount ? cartComponent.model.lineItemCount : 0;
+      cartIcon.textContent = `Cart (${count})`;
+    }
+
+    updateCartCount();
+
+    cartIcon.addEventListener('click', (event) => {
+      event.preventDefault();
+      cartComponent.open();
+    });
+
+    if (typeof cartComponent.on === 'function') {
+      cartComponent.on('update', updateCartCount);
+      cartComponent.on('open', updateCartCount);
+      cartComponent.on('close', updateCartCount);
+    }
+  }
+
+  thumbnails.forEach((thumbnail) => {
     thumbnail.addEventListener('click', () => {
-        mainImage.src = thumbnail.src;
-        mainImage.alt = thumbnail.alt;
-        thumbnails.forEach(image => image.classList.remove('active'));
-        thumbnail.classList.add('active');
+      if (!mainImage) {
+        return;
+      }
+      mainImage.src = thumbnail.src;
+      mainImage.alt = thumbnail.alt;
+      thumbnails.forEach((image) => image.classList.remove('active'));
+      thumbnail.classList.add('active');
     });
-});
+  });
 
-if (thumbnails.length > 0) {
+  if (thumbnails.length > 0) {
     thumbnails[0].classList.add('active');
-}
+  }
+
+  const scriptURL = 'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';
+
+  if (window.ShopifyBuy) {
+    if (window.ShopifyBuy.UI) {
+      ShopifyBuyInit();
+    } else {
+      loadScript();
+    }
+  } else {
+    loadScript();
+  }
+
+  function loadScript() {
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = scriptURL;
+    document.head.appendChild(script);
+    script.onload = ShopifyBuyInit;
+  }
+
+  function ShopifyBuyInit() {
+    const client = ShopifyBuy.buildClient({
+      domain: 'he16ep-sd.myshopify.com',
+      storefrontAccessToken: '5ed99203dd20649eba8fb28c5a656a79',
+    });
+
+    ShopifyBuy.UI.onReady(client).then((ui) => {
+      const productComponent = ui.createComponent('product', {
+        id: '15227611971914',
+        node: document.getElementById('product-component-1761673758850'),
+        moneyFormat: '€{{amount_with_comma_separator}}',
+        options: {
+          product: {
+            iframe: false,
+            buttonDestination: 'cart',
+            contents: {
+              img: false,
+              title: false,
+              price: false,
+              options: true,
+              quantity: false,
+            },
+            text: {
+              button: 'Add to cart',
+            },
+            styles: {
+              product: {
+                'max-width': '100%',
+                'background-color': 'transparent',
+                padding: '0',
+              },
+              option: {
+                'font-size': '0.95rem',
+                'letter-spacing': '0.04em',
+                'text-transform': 'uppercase',
+                'color': '#f3f4f6',
+              },
+              button: {
+                'background-color': '#68ff6f',
+                'color': '#121212',
+                'border-radius': '999px',
+                'padding': '0.75rem 2.15rem',
+                'font-weight': '700',
+                'font-size': '0.95rem',
+                'letter-spacing': '0.08em',
+                'text-transform': 'uppercase',
+                'display': 'inline-flex',
+                'justify-content': 'center',
+                'align-items': 'center',
+                'width': 'auto',
+                'min-width': '160px',
+                'border': '1px solid #68ff6f',
+              },
+              buttonHover: {
+                'background-color': '#4dff59',
+                'color': '#111111',
+              },
+              buttonFocus: {
+                'background-color': '#4dff59',
+                'color': '#111111',
+              },
+            },
+          },
+          modalProduct: {
+            contents: {
+              img: true,
+              imgWithCarousel: true,
+              button: true,
+              buttonWithQuantity: true,
+            },
+            styles: {
+              product: {
+                'text-align': 'left',
+              },
+              button: {
+                'background-color': '#68ff6f',
+                'color': '#121212',
+                'border-radius': '999px',
+              },
+              buttonHover: {
+                'background-color': '#4dff59',
+              },
+              buttonFocus: {
+                'background-color': '#4dff59',
+              },
+            },
+            text: {
+              button: 'Add to cart',
+            },
+          },
+          cart: {
+            styles: {
+              button: {
+                'background-color': '#68ff6f',
+                'color': '#121212',
+                'border-radius': '999px',
+                'font-weight': '700',
+                'text-transform': 'uppercase',
+              },
+              header: {
+                'background-color': '#111111',
+                'color': '#f3f4f6',
+              },
+              footer: {
+                'background-color': '#111111',
+              },
+            },
+            text: {
+              total: 'Subtotal',
+              button: 'Checkout',
+            },
+          },
+          toggle: false,
+        },
+      });
+
+      const applyVariantBindings = () => {
+        const variantSelect = document.querySelector('#product-component-1761673758850 .shopify-buy__option-selectors select');
+        if (variantSelect) {
+          variantSelect.style.fontFamily = 'Arial, sans-serif';
+          variantSelect.style.textTransform = 'none';
+          variantSelect.style.letterSpacing = '0.03em';
+          bindSizeButtonsToSelect(variantSelect);
+        }
+      };
+
+      if (productComponent && typeof productComponent.on === 'function') {
+        productComponent.on('afterRender', applyVariantBindings);
+      }
+      // Fallback in case event API is unavailable
+      setTimeout(applyVariantBindings, 600);
+
+      if (ui.components.cart && ui.components.cart[0]) {
+        setupCartIcon(ui.components.cart[0]);
+      }
+    });
+  }
+
+  window.ShopifyBuyInit = ShopifyBuyInit;
+})();
+</script>
+
+<script>
+// Matrix-style animation behind the product detail page
+(function () {
+  const section = document.querySelector('.product-detail');
+  const canvas = document.getElementById('matrix-canvas-product');
+  if (!section || !canvas) {
+    return;
+  }
+
+  const ctx = canvas.getContext('2d');
+  const colors = ['#169B62', '#FFFFFF', '#FF883E'];
+  const phrase = 'ARE YA WIDE ';
+  const fontFamily = "'Courier New', monospace";
+  const fontSize = 14;
+  let drops = [];
+  let width = 0;
+  let height = 0;
+  let lastFrame = 0;
+
+  function setupCanvas() {
+    const rect = section.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    width = Math.max(rect.width, 1);
+    height = Math.max(rect.height, 1);
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpr, dpr);
+    ctx.font = `${fontSize}px ${fontFamily}`;
+    ctx.textBaseline = 'top';
+    const columnCount = Math.ceil(width / fontSize);
+    drops = Array(columnCount).fill(0);
+  }
+
+  function drawMatrix() {
+    ctx.fillStyle = 'rgba(43, 43, 43, 0.1)';
+    ctx.fillRect(0, 0, width, height);
+
+    for (let i = 0; i < drops.length; i += 1) {
+      const x = i * fontSize;
+      const y = drops[i] * fontSize;
+      const charIndex = (drops[i] + i) % phrase.length;
+      const color = colors[(i + charIndex) % colors.length];
+      const char = phrase.charAt(charIndex);
+      ctx.fillStyle = color;
+      ctx.fillText(char === ' ' ? ' ' : char, x, y);
+
+      if (y > height && Math.random() > 0.975) {
+        drops[i] = 0;
+      } else {
+        drops[i] += 1;
+      }
+    }
+  }
+
+  function animate(time) {
+    if (time - lastFrame > 33) {
+      drawMatrix();
+      lastFrame = time;
+    }
+    requestAnimationFrame(animate);
+  }
+
+  setupCanvas();
+  window.addEventListener('resize', setupCanvas);
+  requestAnimationFrame(animate);
+})();
 </script>
 
 <script>
