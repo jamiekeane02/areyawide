@@ -21,7 +21,6 @@
 <li><a href="#home">Home</a></li>
 <li><a href="products.html">Products</a></li>
 </ul>
-<a href="#cart" class="cart-icon">Cart (0)</a>
 </nav>
 </header>
 
@@ -45,17 +44,19 @@
         <h2 class="section-title">Our T-Shirt Collection</h2>
         <div class="product-grid">
             <div class="product-card" data-product-url="appreciate-every-rollie-tee.html">
-                <div class="product-image">
-                    <img src="images/IMG_3183.jpg" alt="appreciate every rollie Tee">
-                </div>
+                <a class="product-card-link" href="appreciate-every-rollie-tee.html">
+                    <div class="product-image">
+                        <img src="images/IMG_3183.jpg" alt="appreciate every rollie Tee">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">appreciate every rollie Tee</h3>
+                        <p class="product-price">25 EUR</p>
+                    </div>
+                </a>
                 <div class="cart-corner">
                     <svg class="cart-icon-small" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m0 0h8.5"></path>
                     </svg>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">appreciate every rollie Tee</h3>
-                    <p class="product-price">25 EUR</p>
                 </div>
             </div>
         </div>
@@ -88,9 +89,6 @@
 </footer>
 
 <script>
-        // Simple cart functionality
-    let cartCount = 0;
-    const cartIcon = document.querySelector('.cart-icon');
     const productCards = document.querySelectorAll('.product-card');
 
     productCards.forEach(card => {
@@ -98,17 +96,7 @@
             const productUrl = card.dataset.productUrl;
             if (productUrl) {
                 window.location.href = productUrl;
-                return;
             }
-
-            cartCount++;
-            cartIcon.textContent = `Cart (${cartCount})`;
-
-            // Add a brief feedback animation
-            card.style.transform = 'scale(0.98)';
-            setTimeout(() => {
-                card.style.transform = 'translateY(-2px)';
-            }, 150);
         });
     });
 
