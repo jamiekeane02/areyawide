@@ -1053,15 +1053,17 @@ footer {
       .hero {
           margin-top: 0; /* keep hero flush under header on small screens */
           height: auto;
-          min-height: 70vh;
+          min-height: 0;
       }
       .hero-slider {
-          height: 70vh;
-          min-height: 420px;
-          max-height: 780px;
+          height: auto;
+          aspect-ratio: 3 / 2;
+          max-height: 75vh;
+          min-height: 320px;
       }
       .hero-slider img {
           object-fit: contain;
+          object-position: center bottom; /* keep top letterbox, remove bottom gap */
       }
     .paint-main {
         padding: 5rem 0.75rem 3rem;
